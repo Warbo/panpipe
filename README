@@ -1,0 +1,138 @@
+PanPipe
+
+This software is released into the Public Domain
+ -- Chris Warburton <chriswarbo@gmail.com>, 2014-09-28
+
+PanPipe is a simple Haskell script using PanDoc. It allows code blocks in PanDoc
+-compatible documents, eg. Markdown, to be sent to external programs for
+processing.
+
+Any code blocks with a "pipe" attribute will have the contents of that attribute
+executed as a shell command. The contents of the code block will be piped to the
+command's stdin, and the stdout will be used as the new content of the code
+block.
+
+For example, we can execute shell scripts by piping them to a shell:
+
+```{pipe="/bin/sh"}
+echo "Hello world"
+```
+
+This will cause /bin/sh to be called, with 'echo "Hello world"' in its stdin.
+It will execute this echo command, to produce 'Hello world' on its stdout. This
+will become the new contents of the code block, so in the resulting document
+this code block will be replaced by:
+
+```
+Hello world
+```
+
+Usage notes:
+
+Code blocks are executed in the order they appear in the document, so later
+blocks can rely on the effects of earlier scripts. For example:
+
+```{pipe="sh"}
+echo "123" > /tmp/blah
+echo "hello"
+```
+
+```{pipe="sh"}
+cat /tmp/blah
+```
+
+Will become:
+
+```
+hello
+```
+
+```
+123
+```
+
+PanPipe will create a temporary directory, which all "pipe" commands will be
+executed inside. This makes it easier to share data via the filesystem:
+
+```{pipe="sh"}
+echo "hello world" > file1
+echo "done"
+```
+
+```{pipe="sh"}
+cat file1
+```
+
+Will become:
+
+```
+done
+```
+
+```
+hello world
+```
+
+If you want to include a script in your document *and* execute it, you can use
+the "tee" command to save it, then execute it in a following block:
+
+```python {pipe="tee script1.py"}
+print "Foo bar baz"
+```
+
+```{pipe="sh"}
+python script1.py
+```
+
+Will become:
+
+```python
+print "Foo bar baz"
+```
+
+```
+Foo bar baz
+```
+
+To show a script's results *before* its definition, you can use three code
+blocks:
+
+<!--
+Original definition, commented-out
+
+```{pipe="tee script2.py"}
+print "Hello world"
+```
+-->
+
+Results:
+
+```{pipe="sh"}
+python script2.py
+```
+
+Definition:
+
+```python {pipe="sh"}
+cat script2.py
+```
+
+The "pipe" attribute will be stripped from the resulting code block, but
+everything else will be left intact. Notice that options like syntax
+highlighting should be chosen for the *output* contents, not the input.
+
+For example, the following code block contains PHP code, but it's using "html"
+as the language since that's what its *output* will be:
+
+```html {pipe="php"}
+<?php
+
+echo "<ul>\n";
+foreach (range(0, 99) as $x) {
+  echo "<li>{$x}</li>\n";
+}
+echo "</ul>";
+```
+
+PanPipe also works on inline code snippets; for example, my root filesystem is
+currently at `df -h | grep "/$" | grep -o "[0-9]*%"`{pipe="sh"} capacity.
