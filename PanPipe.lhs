@@ -1,41 +1,43 @@
-module PanPipe where
+> module PanPipe where
 
-import Control.Applicative
-import Control.Exception
-import Data.List
-import Data.Maybe
-import System.Directory
-import System.IO.Temp
-import System.Process
-import Text.Pandoc
-import Text.Pandoc.Walk (walkM)
+> import Control.Applicative
+> import Control.Exception
+> import Data.List
+> import Data.Maybe
+> import System.Directory
+> import System.IO.Temp
+> import System.Process
+> import Text.Pandoc
+> import Text.Pandoc.Walk (walkM)
 
-pipe :: Block -> IO Block
-pipe (CodeBlock as s) = case partPipes as of
-                             (as', Nothing) -> CodeBlock as' <$> return s
-                             (as', Just p)  -> CodeBlock as' <$> readProcess "sh" ["-c", p] s
-pipe x                = return x
+> pipe :: Block -> IO Block
+> pipe (CodeBlock as s) = case partPipes as of
+>                              (as', Nothing) -> CodeBlock as' <$> return s
+>                              (as', Just p)  -> CodeBlock as' <$> readProcess "sh" ["-c", p] s
+> pipe x                = return x
 
-partPipes :: Attr -> (Attr, Maybe String)
-partPipes (x, y, zs) = let (pipes, zs') = partition (("pipe" ==) . fst) zs
-                        in ((x, y, zs'), snd <$> listToMaybe pipes)
+> partPipes :: Attr -> (Attr, Maybe String)
+> partPipes (x, y, zs) = let (pipes, zs') = partition (("pipe" ==) . fst) zs
+>                         in ((x, y, zs'), snd <$> listToMaybe pipes)
 
-transform :: Pandoc -> IO Pandoc
-transform doc = withSystemTempDirectory "panpipe" $ doInDir `flip` transformDoc doc
+> transform :: Pandoc -> IO Pandoc
+> transform doc = withSystemTempDirectory "panpipe" $ doInDir (transformDoc doc)
 
-cd :: FilePath -> IO FilePath
-cd d = getCurrentDirectory <* setCurrentDirectory d
+> cd :: FilePath -> IO FilePath
+> cd d = getCurrentDirectory <* setCurrentDirectory d
 
-doInDir :: FilePath -> IO a -> IO a
-doInDir d = bracket (cd d) setCurrentDirectory . const
+> doInDir :: IO a -> FilePath -> IO a
+> doInDir a d = bracket (cd d) setCurrentDirectory (const a)
 
-transformDoc = walkM pipe
+Use Pandoc to parse, traverse and pretty-print our documents
 
-readDoc :: String -> Pandoc
-readDoc = readMarkdown def
+> transformDoc = walkM pipe
 
-writeDoc :: Pandoc -> String
-writeDoc = writeMarkdown def
+> readDoc :: String -> Pandoc
+> readDoc = readMarkdown def
 
-processDoc :: String -> IO String
-processDoc = fmap writeDoc . transform . readDoc
+> writeDoc :: Pandoc -> String
+> writeDoc = writeMarkdown def
+
+> processDoc :: String -> IO String
+> processDoc = fmap writeDoc . transform . readDoc
