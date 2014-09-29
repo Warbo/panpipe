@@ -1,11 +1,8 @@
-import Test.Framework (Test)
-import Test.Framework (defaultMain, testGroup)
-import Test.Framework.Providers.HUnit
-import Test.Framework.Providers.QuickCheck2 (testProperty)
-import Test.QuickCheck hiding ((==>))
+import Test.QuickCheck
+import PanPipe
 
-main :: IO ()
-main = defaultMain tests
+--main :: IO ()
+--main = quickCheck 
 
-tests :: [Test]
-tests = []
+--pipeFound :: String -> String -> [String] -> [(String, String)]
+pipeFound p x ys zs = snd (partPipes (x, ys, ("pipe", p):zs)) == Just p

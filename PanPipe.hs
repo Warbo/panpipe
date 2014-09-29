@@ -1,6 +1,7 @@
 module PanPipe where
 
 import Control.Applicative
+import Control.Exception
 import Data.List
 import Data.Maybe
 import System.Directory
@@ -9,8 +10,6 @@ import System.Process
 import Text.Pandoc
 import Text.Pandoc.Walk (walkM)
 
-key = "pipe"
-
 pipe :: Block -> IO Block
 pipe (CodeBlock as s) = case partPipes as of
                              (as', Nothing) -> CodeBlock as' <$> return s
@@ -18,16 +17,17 @@ pipe (CodeBlock as s) = case partPipes as of
 pipe x                = return x
 
 partPipes :: Attr -> (Attr, Maybe String)
-partPipes (x, y, zs) = let (zs', pipes) = partition ((key ==) . fst) zs
+partPipes (x, y, zs) = let (pipes, zs') = partition (("pipe" ==) . fst) zs
                         in ((x, y, zs'), snd <$> listToMaybe pipes)
 
 transform :: Pandoc -> IO Pandoc
-transform doc = let f dir = do cwd <- getCurrentDirectory
-                               setCurrentDirectory dir
-                               let doc' = transformDoc doc
-                               setCurrentDirectory cwd
-                               doc'
-                 in withSystemTempDirectory "panpipe" f
+transform doc = withSystemTempDirectory "panpipe" $ doInDir `flip` transformDoc doc
+
+cd :: FilePath -> IO FilePath
+cd d = getCurrentDirectory <* setCurrentDirectory d
+
+doInDir :: FilePath -> IO a -> IO a
+doInDir d = bracket (cd d) setCurrentDirectory . const
 
 transformDoc = walkM pipe
 

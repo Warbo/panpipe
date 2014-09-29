@@ -8,9 +8,10 @@ PanPipe is a simple Haskell script using PanDoc. It allows code blocks in PanDoc
 processing.
 
 Any code blocks with a "pipe" attribute will have the contents of that attribute
-executed as a shell command. The contents of the code block will be piped to the
+executed as a shell command. The body of the code block will be piped to that
 command's stdin, and the stdout will be used as the new content of the code
-block.
+block. A non-zero exit code will cause PanPipe to exit with that code; stderr
+will be sent to PanPipe's stderr.
 
 For example, we can execute shell scripts by piping them to a shell:
 
@@ -19,7 +20,7 @@ echo "Hello world"
 ```
 
 This will cause /bin/sh to be called, with 'echo "Hello world"' in its stdin.
-It will execute this echo command, to produce 'Hello world' on its stdout. This
+It will execute the echo command, to produce 'Hello world' on its stdout. This
 will become the new contents of the code block, so in the resulting document
 this code block will be replaced by:
 
@@ -30,7 +31,7 @@ Hello world
 Usage notes:
 
 Code blocks are executed in the order they appear in the document, so later
-blocks can rely on the effects of earlier scripts. For example:
+blocks can rely on the effects of earlier ones. For example:
 
 ```{pipe="sh"}
 echo "123" > /tmp/blah
@@ -51,8 +52,8 @@ hello
 123
 ```
 
-PanPipe will create a temporary directory, which all "pipe" commands will be
-executed inside. This makes it easier to share data via the filesystem:
+PanPipe will execute all commands inside one temporary directory, to make it
+easier to share data via the filesystem:
 
 ```{pipe="sh"}
 echo "hello world" > file1
@@ -74,7 +75,7 @@ hello world
 ```
 
 If you want to include a script in your document *and* execute it, you can use
-the "tee" command to save it, then execute it in a following block:
+the "tee" command to save it, then execute it in a subsequent block:
 
 ```python {pipe="tee script1.py"}
 print "Foo bar baz"
@@ -94,8 +95,8 @@ print "Foo bar baz"
 Foo bar baz
 ```
 
-To show a script's results *before* its definition, you can use three code
-blocks:
+To hide the result, you can wrap the block in comments. For example, to show a
+program listing after its results, we can do:
 
 <!--
 Original definition, commented-out
@@ -105,13 +106,13 @@ print "Hello world"
 ```
 -->
 
-Results:
+Show some results:
 
 ```{pipe="sh"}
 python script2.py
 ```
 
-Definition:
+Show the program listing:
 
 ```python {pipe="sh"}
 cat script2.py
@@ -122,16 +123,27 @@ everything else will be left intact. Notice that options like syntax
 highlighting should be chosen for the *output* contents, not the input.
 
 For example, the following code block contains PHP code, but it's using "html"
-as the language since that's what its *output* will be:
+for its syntax highlighting since that's what its *output* will be:
 
 ```html {pipe="php"}
 <?php
 
 echo "<ul>\n";
-foreach (range(0, 99) as $x) {
+foreach (range(0, 3) as $x) {
   echo "<li>{$x}</li>\n";
 }
 echo "</ul>";
+```
+
+The resulting document will contain:
+
+```html
+<ul>
+<li>0</li>
+<li>1</li>
+<li>2</li>
+<li>3</li>
+</ul>
 ```
 
 PanPipe also works on inline code snippets; for example, my root filesystem is
