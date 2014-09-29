@@ -2,6 +2,7 @@ module PanPipe where
 
 import Control.Applicative
 import Data.List
+import Data.Maybe
 import System.Directory
 import System.IO.Temp
 import System.Process
@@ -11,19 +12,14 @@ import Text.Pandoc.Walk (walkM)
 key = "pipe"
 
 pipe :: Block -> IO Block
-pipe b = case b of
-              CodeBlock as s -> runPipe as s
-              _              -> return b
+pipe (CodeBlock as s) = case partPipes as of
+                             (as', Nothing) -> CodeBlock as' <$> return s
+                             (as', Just p)  -> CodeBlock as' <$> readProcess p [] s
+pipe x                = return x
 
-runPipe as s = case getPipe as of
-                    Nothing -> return (CodeBlock as s)
-                    Just p  -> fmap   (CodeBlock (noPipe as))
-                                      (readProcess p [] s)
-
-noPipe :: Attr -> Attr
-noPipe (x, y, zs) = (x, y, filter ((/= key) . fst) zs)
-
-getPipe (_, _, as) = snd <$> find ((== key) . fst) as
+partPipes :: Attr -> (Attr, Maybe String)
+partPipes (x, y, zs) = let (zs', pipes) = partition ((key ==) . fst) zs
+                        in ((x, y, zs'), snd <$> listToMaybe pipes)
 
 transform :: Pandoc -> IO Pandoc
 transform doc = let f dir = do cwd <- getCurrentDirectory
@@ -42,4 +38,4 @@ writeDoc :: Pandoc -> String
 writeDoc = writeMarkdown def
 
 processDoc :: String -> IO String
-processDoc x = writeDoc <$> transform (readDoc x)
+processDoc = fmap writeDoc . transform . readDoc
