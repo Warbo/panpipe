@@ -26,9 +26,12 @@ noPipe (x, y, zs) = (x, y, filter ((/= key) . fst) zs)
 getPipe (_, _, as) = snd <$> find ((== key) . fst) as
 
 transform :: Pandoc -> IO Pandoc
-transform = let f d = do setCurrentDirectory d
-                         transformDoc
-             in withSystemTempDirectory "panpipe" f
+transform doc = let f dir = do cwd <- getCurrentDirectory
+                               setCurrentDirectory dir
+                               let doc' = transformDoc doc
+                               setCurrentDirectory cwd
+                               doc'
+                 in withSystemTempDirectory "panpipe" f
 
 transformDoc = walkM pipe
 
