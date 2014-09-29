@@ -13,7 +13,7 @@ import Text.Pandoc.Walk (walkM)
 pipe :: Block -> IO Block
 pipe (CodeBlock as s) = case partPipes as of
                              (as', Nothing) -> CodeBlock as' <$> return s
-                             (as', Just p)  -> CodeBlock as' <$> readProcess p [] s
+                             (as', Just p)  -> CodeBlock as' <$> readProcess "sh" ["-c", p] s
 pipe x                = return x
 
 partPipes :: Attr -> (Attr, Maybe String)
