@@ -48,8 +48,9 @@ Hello
 
 ### Execution Order ###
 
-Code blocks are executed in the order they appear in the document, so later
-blocks can rely on the effects of earlier ones. For example:
+PanPipe uses two passes: in the first, all code *blocks* are executed, in the
+order they appear in the document. Hence later blocks can rely on the effects of
+earlier ones. For example:
 
 ```{pipe="sh"}
 echo "123" > /tmp/blah
@@ -69,6 +70,9 @@ hello
 ```
 123
 ```
+
+The second pass executes *inline* code, in the order they appear in the
+document.
 
 ### Environment ###
 

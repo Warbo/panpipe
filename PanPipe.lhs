@@ -10,14 +10,17 @@
 > import Text.Pandoc
 > import Text.Pandoc.Walk (walkM)
 
-> pipe :: Block -> IO Block
-> pipe (CodeBlock as s) = case partPipes as of
->                              (as', Nothing) -> CodeBlock as' <$> return s
->                              (as', Just p)  -> CodeBlock as' <$> readShell p s
-> pipe (Code      as s) = case partPipes as of
->                              (as', Nothing) -> Code as' <$> return s
->                              (as', Just p)  -> Code as' <$> readShell p s
-> pipe x                = return x
+> pipeB :: Block -> IO Block
+> pipeB (CodeBlock as s) = case partPipes as of
+>                               (as', Nothing) -> CodeBlock as' <$> return s
+>                               (as', Just p)  -> CodeBlock as' <$> readShell p s
+> pipeB x                = return x
+
+> pipeI :: Inline -> IO Inline
+> pipeI (Code      as s) = case partPipes as of
+>                               (as', Nothing) -> Code as' <$> return s
+>                               (as', Just p)  -> Code as' <$> readShell p s
+> pipeI x                = return x
 
 > readShell :: FilePath -> String -> IO String
 > readShell p s = readProcess "sh" ["-c", p] s
@@ -37,7 +40,8 @@
 
 Use Pandoc to parse, traverse and pretty-print our documents
 
-> transformDoc = walkM pipe
+> transformDoc d = do d' <- walkM pipeB d
+>                     walkM pipeI d'
 
 > readDoc :: String -> Pandoc
 > readDoc = readMarkdown def
