@@ -13,8 +13,14 @@
 > pipe :: Block -> IO Block
 > pipe (CodeBlock as s) = case partPipes as of
 >                              (as', Nothing) -> CodeBlock as' <$> return s
->                              (as', Just p)  -> CodeBlock as' <$> readProcess "sh" ["-c", p] s
+>                              (as', Just p)  -> CodeBlock as' <$> readShell p s
+> pipe (Code      as s) = case partPipes as of
+>                              (as', Nothing) -> Code as' <$> return s
+>                              (as', Just p)  -> Code as' <$> readShell p s
 > pipe x                = return x
+
+> readShell :: FilePath -> String -> IO String
+> readShell p s = readProcess "sh" ["-c", p] s
 
 > partPipes :: Attr -> (Attr, Maybe String)
 > partPipes (x, y, zs) = let (pipes, zs') = partition (("pipe" ==) . fst) zs
