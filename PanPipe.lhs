@@ -16,7 +16,7 @@
 > pipeI :: Inline -> IO Inline
 > pipeI (Code as s)
 >     |  Just (as', p) <- partPipes as = Code as' <$> readShell p s
-> pipeI x = walkM pipeI x
+> pipeI x = return x
 
 > readShell :: FilePath -> String -> IO String
 > readShell p s = readProcess "sh" ["-c", p] s
