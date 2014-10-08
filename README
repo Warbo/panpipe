@@ -9,11 +9,11 @@ PanPipe is a simple Haskell script using PanDoc. It allows code blocks in PanDoc
 -compatible documents, eg. Markdown, to be sent to external programs for
 processing.
 
-Any code blocks with a "pipe" attribute will have the contents of that attribute
-executed as a shell command. The body of the code block will be piped to that
-command's stdin, and the stdout will be used as the new content of the code
-block. A non-zero exit code will cause PanPipe to exit with that code; stderr
-will be sent to PanPipe's stderr.
+Any code blocks or lines with a "pipe" attribute will have the contents of that
+attribute executed as a shell command. The body of the block/line will be piped
+to that command's stdin, and the stdout will replace the body of that
+block/line. A non-zero exit code will cause PanPipe to exit with that code;
+stderr will be sent to PanPipe's stderr.
 
 For example, we can execute shell scripts by piping them to "sh":
 
@@ -76,9 +76,9 @@ document.
 
 ### Environment ###
 
-Commands will inherit the environment from the shell which calls them, except
+Commands will inherit the environment from the shell which calls panpipe, except
 they will all be executed in a temporary directory. This makes it easier to
-share data between blocks, without leaving cruft behind:
+share data between code, without leaving cruft behind:
 
 ```{pipe="sh"}
 echo "hello world" > file1
@@ -141,16 +141,14 @@ Foo bar baz
 ### Changing Block Order ###
 
 Blocks will always be executed in document-order, so you must arrange dependent
-blocks appropriately. However, execution order doesn't have to dictate the order
-they're rendered in.
+blocks appropriately. However, we can display blocks in any order by saving them
+to files and dumping them later.
 
 For example, to show the output of a program *before* its source code listing,
-we can define the program first, using "tee" to save it to a file and HTML
-comments to hide the program listing in the resulting document:
+we can define the program first, using "tee" to save it to a file and a HTML
+class to hide the listing in the resulting document:
 
-Program listing, commented-out.
-
-```{pipe="tee script2.py"}
+```{.hidden pipe="tee script2.py"}
 print "Hello world"
 ```
 
@@ -160,8 +158,8 @@ Next we can include a block which executes the file we created:
 python script2.py
 ```
 
-Finally we can include a program listing by having a block dump the contents of
-the file (using ".python" for syntax highlighting):
+Finally we can include a listing by having a block dump the contents of the file
+(using ".python" for syntax highlighting):
 
 ```{.python pipe="sh"}
 cat script2.py
@@ -171,3 +169,43 @@ cat script2.py
 
 PanPipe also works on inline code snippets; for example, my root filesystem is
 currently at `df -h | grep "/$" | grep -o "[0-9]*%"`{pipe="sh"} capacity.
+
+### PanHandler ###
+
+PanPipe keeps the results of script execution inside code blocks/lines, where
+they can't interfere with the formatting. If you want to splice some of these
+results back into the document, you can use the PanHandler script which was
+written to complement PanPipe.
+
+For example, to generate a Markdown list and insert it into the document, we can
+do this:
+
+```{.unwrap pipe="python -"}
+for n in range(5):
+    print " - Element " + str(n)
+```
+
+Running this code through PanPipe will give:
+
+```{.unwrap}
+ - Element 0
+ - Element 1
+ - Element 2
+ - Element 3
+```
+
+Running this code through PanHandler will give:
+
+ - Element 0
+ - Element 1
+ - Element 2
+ - Element 3
+
+In a similar way, we can include other Markdown documents quite easily:
+
+```{.unwrap pipe="sh"}
+cat /some/file.md
+
+wget -O md http://some.site/some/markdown
+cat md
+```
