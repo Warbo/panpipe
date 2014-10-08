@@ -170,6 +170,12 @@ cat script2.py
 PanPipe also works on inline code snippets; for example, my root filesystem is
 currently at `df -h | grep "/$" | grep -o "[0-9]*%"`{pipe="sh"} capacity.
 
+### Testing ###
+
+PanPipe's test suite lives in `test-real.hs` and uses the Arbitrary instances
+from Pandoc's test modules. Since those modules aren't exported, the `test.sh`
+script will download them for you and run our tests.
+
 ### PanHandler ###
 
 PanPipe keeps the results of script execution inside code blocks/lines, where
