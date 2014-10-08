@@ -8,15 +8,23 @@
 > import Text.Pandoc.Shared (inDirectory)
 > import Text.Pandoc.Walk (walkM)
 
-> pipeB :: Block -> IO Block
-> pipeB (CodeBlock as s)
->     |  Just (as', p) <- partPipes as = CodeBlock as' <$> readShell p s
-> pipeB x = walkM pipeI x
+> pipeBWith :: (Functor m, Monad m) => (String -> String -> m String)
+>                                   -> Block
+>                                   -> m Block
+> pipeBWith f (CodeBlock as s)
+>           |  Just (as', p) <- partPipes as = CodeBlock as' <$> f p s
+> pipeBWith f x = walkM (pipeIWith f) x
 
-> pipeI :: Inline -> IO Inline
-> pipeI (Code as s)
->     |  Just (as', p) <- partPipes as = Code as' <$> readShell p s
-> pipeI x = return x
+> pipeB = pipeBWith readShell
+
+> pipeIWith :: (Functor m, Monad m) => (String -> String -> m String)
+>                                   -> Inline
+>                                   -> m Inline
+> pipeIWith f (Code as s)
+>           |  Just (as', p) <- partPipes as = Code as' <$> f p s
+> pipeIWith f x = return x
+
+> pipeI = pipeIWith readShell
 
 > readShell :: FilePath -> String -> IO String
 > readShell p s = readProcess "sh" ["-c", p] s
