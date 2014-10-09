@@ -35,18 +35,8 @@
 >                             _               -> Nothing
 
 > transform :: Pandoc -> IO Pandoc
-> transform doc = withSystemTempDirectory "panpipe" $ (`inDirectory` transformDoc doc)
-
-Use Pandoc to parse, traverse and pretty-print our documents
+> transform doc = withSystemTempDirectory "panpipe"
+>                                         (`inDirectory` transformDoc doc)
 
 > transformDoc :: Pandoc -> IO Pandoc
 > transformDoc = walkM pipeB
-
-> readDoc :: String -> Pandoc
-> readDoc = readMarkdown def
-
-> writeDoc :: Pandoc -> String
-> writeDoc = writeMarkdown def
-
-> processDoc :: String -> IO String
-> processDoc = fmap writeDoc . transform . readDoc

@@ -1,3 +1,5 @@
 module Main where
 import PanPipe
-main = getContents >>= processDoc >>= putStr
+import Text.Pandoc.JSON
+
+main = toJSONFilter transform
