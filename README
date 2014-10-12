@@ -1,7 +1,23 @@
 # PanPipe #
 
-This software is released into the Public Domain
- -- Chris Warburton <chriswarbo@gmail.com>, 2014-09-28
+This software is released into the Public Domain, except for the test-real.hs
+file which is licensed under the terms of the GNU General Public Licence
+version 3 or above.
+  -- Chris Warburton <chriswarbo@gmail.com>, 2014-09-28
+
+## Usage ##
+
+You'll need some way to run Haskell. Check your package manager or go to
+https://www.haskell.org/platform/ to get a compiler or a `runhaskell`
+interpreter.
+
+You'll also need Pandoc available as a library, which you can get from your
+package manager or with `cabal install pandoc`, and will probably want the
+`pandoc` command available too.
+
+To use PanPipe, invoke it as a Pandoc "filter", like this:
+
+`pandoc --filter ./panpipe input_file > output_file`
 
 ## Intro ##
 
