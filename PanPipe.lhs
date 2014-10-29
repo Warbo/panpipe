@@ -3,6 +3,7 @@
 > import Control.Applicative
 > import Data.List
 > import System.IO.Temp (withSystemTempDirectory)
+> import System.Posix
 > import System.Process
 > import Text.Pandoc
 > import Text.Pandoc.Shared (inDirectory)
@@ -35,8 +36,11 @@
 >                             _               -> Nothing
 
 > transform :: Pandoc -> IO Pandoc
-> transform doc = withSystemTempDirectory "panpipe"
->                                         (`inDirectory` transformDoc doc)
+> transform doc = do cwd <-getWorkingDirectory
+>                    withSystemTempDirectory
+>                        "panpipe"
+>                        (\dir -> do createSymbolicLink cwd (dir ++ "/root")
+>                                    inDirectory dir (transformDoc doc))
 
 > transformDoc :: Pandoc -> IO Pandoc
 > transformDoc = walkM pipeB
