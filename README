@@ -7,6 +7,8 @@ version 3 or above.
 
 ## Usage ##
 
+Tested on GNU/Linux, might work on other POSIX systems.
+
 You'll need some way to run Haskell. Check your package manager or go to
 https://www.haskell.org/platform/ to get a compiler or a `runhaskell`
 interpreter.
@@ -114,6 +116,10 @@ done
 ```
 hello world
 ```
+
+The temporary directory will contain a symlink called "root" which points to
+wherever Pandoc was called from. This allows resources to be shared across
+invocations (although it's not recommended to *modify* anything in root).
 
 ### Imperative Blocks ###
 
