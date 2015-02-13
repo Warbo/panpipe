@@ -5,7 +5,11 @@ stdenv.mkDerivation {
 
   src = ./.;
 
-  buildInputs = [ haskellPackages.ghc haskellPackages.pandoc ];
+  buildInputs = [
+    haskellPackages.ghc
+    haskellPackages.pandoc
+    haskellPackages.QuickCheck
+  ];
 
   buildPhase = ''
     ghc --make panpipe.hs

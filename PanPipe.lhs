@@ -2,6 +2,8 @@
 
 > import Control.Applicative
 > import Data.List
+> import System.Exit
+> import System.IO
 > import System.IO.Temp (withSystemTempDirectory)
 > import System.Posix
 > import System.Process
@@ -28,7 +30,10 @@
 > pipeI = pipeIWith readShell
 
 > readShell :: FilePath -> String -> IO String
-> readShell p s = readProcess "sh" ["-c", p] s
+> readShell p s = do (code, out, err) <- readProcessWithExitCode "sh" ["-c", p] s
+>                    case code of
+>                         ExitSuccess -> return out
+>                         _           -> hPutStrLn stderr err >> exitWith code
 
 > partPipes :: Attr -> Maybe (Attr, String)
 > partPipes (x, y, zs) = case partition (("pipe" ==) . fst) zs of
