@@ -31,9 +31,12 @@
 
 > readShell :: FilePath -> String -> IO String
 > readShell p s = do (code, out, err) <- readProcessWithExitCode "sh" ["-c", p] s
+>                    if err /= ""
+>                       then hPutStrLn stderr err
+>                       else return ()
 >                    case code of
 >                         ExitSuccess -> return out
->                         _           -> hPutStrLn stderr err >> exitWith code
+>                         _           -> exitWith code
 
 > partPipes :: Attr -> Maybe (Attr, String)
 > partPipes (x, y, zs) = case partition (("pipe" ==) . fst) zs of
