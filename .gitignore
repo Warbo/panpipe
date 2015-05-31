@@ -2,4 +2,4 @@
 *.o
 panpipe
 pandoc
-
+dist/
