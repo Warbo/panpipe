@@ -6,7 +6,7 @@ let pkg = haskellngPackages.callPackage
              , process, random, stdenv, temporary, text, time, unix
              }:
              mkDerivation {
-               pname = "PanPipe";
+               pname = "panpipe";
                version = "0.1.0.0";
                src = ./.;
                isLibrary = false;
