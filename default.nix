@@ -4,7 +4,7 @@
 , process, random, stdenv, temporary, text, time, unix
 }:
 mkDerivation {
-  pname = "panpipe";
+  pname = "PanPipe";
   version = "0.1.0.0";
   src = ./.;
   isLibrary = false;
