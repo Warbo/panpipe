@@ -10,12 +10,12 @@ mkDerivation {
   src = ./.;
   isLibrary = false;
   isExecutable = true;
-  buildDepends = [
+  executableHaskellDepends = [
     base binary bytestring Cabal containers data-default directory
     extensible-exceptions filepath mtl network old-locale old-time
     pandoc pandoc-types parsec process random temporary text time unix
   ];
-  testDepends = [
+  testHaskellDepends = [
     base containers pandoc pandoc-types process QuickCheck tasty
     tasty-quickcheck temporary unix
   ];

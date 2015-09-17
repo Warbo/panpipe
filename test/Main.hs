@@ -1,4 +1,5 @@
 import           Control.Applicative
+import           Data.Maybe
 import           PanPipe
 import           Text.Pandoc
 import           Test.Tasty (defaultMain, testGroup)
@@ -26,7 +27,7 @@ pipeIAttr i c a1 a2 = let at x = (i, c, a1 ++ x ++ a2)
                                                         undefined)
                       in at [] == as
 
-nonPipe as = partPipes (undefined, undefined, filter ((/= "pipe") . fst) as) == Nothing
+nonPipe as = isNothing $ partPipes (undefined, undefined, filter ((/= "pipe") . fst) as)
 
 pipeClass p as = (snd <$> partPipes (undefined, undefined, ("pipe", p):as)) == Just p
 
