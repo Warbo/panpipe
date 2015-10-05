@@ -13,7 +13,7 @@ maintainer:          chriswarbo@gmail.com
 -- copyright:           
 category:            Text
 build-type:          Simple
-extra-source-files:  README
+extra-source-files:  README.md
 cabal-version:       >=1.10
 
 executable panpipe
