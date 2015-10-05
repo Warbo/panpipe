@@ -33,18 +33,22 @@ stderr will be sent to PanPipe's stderr.
 
 For example, we can execute shell scripts by piping them to "sh":
 
+````
 ```{pipe="sh"}
 echo "Hello world"
 ```
+````
 
 This will cause "sh" to be called, with 'echo "Hello world"' as its stdin.
 It will execute the echo command, to produce 'Hello world' as its stdout. This
 will become the new contents of the code block, so in the resulting document
 this code block will be replaced by:
 
+````
 ```
 Hello world
 ```
+````
 
 ## Usage Notes ##
 
@@ -52,15 +56,19 @@ Hello world
 
 The "pipe" attribute is removed, but other attributes, classes and IDs remain:
 
+````
 ```{#foo .bar baz="quux" pipe="sh"}
 echo 'Hello'
 ```
+````
 
 Will become:
 
+````
 ```{#foo .bar baz="quux"}
 Hello
 ```
+````
 
 ### Execution Order ###
 
@@ -68,6 +76,7 @@ PanPipe uses two passes: in the first, all code *blocks* are executed, in the
 order they appear in the document. Hence later blocks can rely on the effects of
 earlier ones. For example:
 
+````
 ```{pipe="sh"}
 echo "123" > /tmp/blah
 echo "hello"
@@ -76,9 +85,11 @@ echo "hello"
 ```{pipe="sh"}
 cat /tmp/blah
 ```
+````
 
 Will become:
 
+````
 ```
 hello
 ```
@@ -86,6 +97,7 @@ hello
 ```
 123
 ```
+````
 
 The second pass executes *inline* code, in the order they appear in the
 document.
@@ -96,6 +108,7 @@ Commands will inherit the environment from the shell which calls panpipe, except
 they will all be executed in a temporary directory. This makes it easier to
 share data between code, without leaving cruft behind:
 
+````
 ```{pipe="sh"}
 echo "hello world" > file1
 echo "done"
@@ -104,9 +117,11 @@ echo "done"
 ```{pipe="sh"}
 cat file1
 ```
+````
 
 Will become:
 
+````
 ```
 done
 ```
@@ -114,6 +129,7 @@ done
 ```
 hello world
 ```
+````
 
 The temporary directory will contain a symlink called "root" which points to
 wherever Pandoc was called from. This allows resources to be shared across
@@ -124,15 +140,19 @@ invocations (although it's not recommended to *modify* anything in root).
 If you want to execute a block for some effect, but ignore its output, you can
 hide the result using a class or attribute:
 
+````
 ```{.hidden pipe="python -"}
 import random
 with open('entropy', 'w') as f:
     f.write(str(random.randint(0, 100)))
 ```
+````
 
 When rendered to HTML will produce:
 
+```html
 <pre class="hidden"><code></code></pre>
+```
 
 ### Program Listings ###
 
@@ -140,6 +160,7 @@ A common use-case is to include a program listing in a document *and* show the
 results of executing it. You can do this by passing the source code to the Unix
 "tee" command, then using a subsequent shell script to run it:
 
+````
 ```{.python pipe="tee script1.py"}
 print "Foo bar baz"
 ```
@@ -147,9 +168,11 @@ print "Foo bar baz"
 ```{pipe="sh"}
 python script1.py
 ```
+````
 
 Will become:
 
+````
 ```{.python}
 print "Foo bar baz"
 ```
@@ -157,6 +180,7 @@ print "Foo bar baz"
 ```
 Foo bar baz
 ```
+````
 
 ### Changing Block Order ###
 
@@ -168,33 +192,33 @@ For example, to show the output of a program *before* its source code listing,
 we can define the program first, using "tee" to save it to a file and a HTML
 class to hide the listing in the resulting document:
 
+````
 ```{.hidden pipe="tee script2.py"}
 print "Hello world"
 ```
+````
 
 Next we can include a block which executes the file we created:
 
+````
 ```{pipe="sh"}
 python script2.py
 ```
+````
 
 Finally we can include a listing by having a block dump the contents of the file
 (using ".python" for syntax highlighting):
 
+````
 ```{.python pipe="sh"}
 cat script2.py
 ```
+````
 
 ### Inline Snippets ###
 
 PanPipe also works on inline code snippets; for example, my root filesystem is
-currently at `df -h | grep "/$" | grep -o "[0-9]*%"`{pipe="sh"} capacity.
-
-### Testing ###
-
-PanPipe's test suite lives in `test-real.hs` and uses the Arbitrary instances
-from Pandoc's test modules. Since those modules aren't exported, the `test.sh`
-script will download them for you and run our tests.
+currently at `` `df -h | grep "/$" | grep -o "[0-9]*%"`{pipe="sh"} `` capacity.
 
 ### PanHandler ###
 
@@ -206,21 +230,25 @@ written to complement PanPipe.
 For example, to generate a Markdown list and insert it into the document, we can
 do this:
 
+````
 ```{.unwrap pipe="python -"}
 for n in range(5):
     print " - Element " + str(n)
 ```
+````
 
 Running this code through PanPipe will give:
 
+````
 ```{.unwrap}
  - Element 0
  - Element 1
  - Element 2
  - Element 3
 ```
+````
 
-Running this code through PanHandler will give:
+Running *that* code through PanHandler will give:
 
  - Element 0
  - Element 1
@@ -229,9 +257,11 @@ Running this code through PanHandler will give:
 
 In a similar way, we can include other Markdown documents quite easily:
 
+````
 ```{.unwrap pipe="sh"}
 cat /some/file.md
 
 wget -O md http://some.site/some/markdown
 cat md
 ```
+````
