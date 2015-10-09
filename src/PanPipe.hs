@@ -30,7 +30,7 @@ pipeIWith f x = return x
 pipeI = pipeIWith readShell
 
 readShell :: FilePath -> String -> IO String
-readShell p s = readProcess "sh" ["-c", p] s
+readShell p = readProcess "sh" ["-c", p]
 
 partPipes :: Attr -> Maybe (Attr, String)
 partPipes (x, y, zs) = case partition (("pipe" ==) . fst) zs of
