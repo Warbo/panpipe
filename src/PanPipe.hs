@@ -8,8 +8,9 @@ import System.IO.Temp (withSystemTempDirectory)
 import System.Posix
 import System.Process
 import Text.Pandoc
+import Text.Pandoc.JSON   (toJSONFilter)
 import Text.Pandoc.Shared (inDirectory)
-import Text.Pandoc.Walk (walkM)
+import Text.Pandoc.Walk   (walkM)
 
 pipeBWith :: (Functor m, Monad m) => (String -> String -> m String)
                                   -> Block
@@ -46,3 +47,5 @@ transform doc = do cwd <-getWorkingDirectory
 
 transformDoc :: Pandoc -> IO Pandoc
 transformDoc = walkM pipeB
+
+panpipeMain = toJSONFilter transform
