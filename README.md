@@ -19,10 +19,16 @@ To use PanPipe, invoke it as a Pandoc "filter", like this:
 
 `pandoc --filter ./panpipe input_file > output_file`
 
+You can also run `panpipe` as a standalone command, but note that its stdio
+should be in PanDoc's JSON format, rather than e.g. raw Markdown. You can
+convert *to* PanDoc JSON using a command like `pandoc -t json`, and convert
+*from* PanDoc JSON using `pandoc -f json`. The `--filter` argument automates
+this plumbing.
+
 ## Intro ##
 
-PanPipe is a simple Haskell script using PanDoc. It allows code blocks in PanDoc
--compatible documents, eg. Markdown, to be sent to external programs for
+PanPipe is a simple Haskell script using PanDoc. It allows code blocks in
+PanDoc-compatible documents, eg. Markdown, to be sent to external programs for
 processing.
 
 Any code blocks or lines with a "pipe" attribute will have the contents of that
@@ -227,41 +233,70 @@ they can't interfere with the formatting. If you want to splice some of these
 results back into the document, you can use the PanHandle script which was
 written to complement PanPipe.
 
-For example, to generate a Markdown list and insert it into the document, we can
-do this:
+To prevent ambiguity, PanHandle requires data to be in PanDoc's JSON format. We
+can convert things to that format using the `-t json` option to the `pandoc`
+command. For example, to generate a Markdown list and insert it into the
+document, we can do this:
 
 ````
-```{.unwrap pipe="python -"}
+```{.unwrap pipe="python - | pandoc -t json"}
 for n in range(5):
     print " - Element " + str(n)
 ```
 ````
 
-Running this code through PanPipe will give:
+If we run this document through PanPipe, the Python code will output the
+following to its stdout:
+
+```
+ - Element 0
+ - Element 1
+ - Element 2
+ - Element 3
+ - Element 4
+```
+
+This will be transformed by `pandoc -t json` into the following:
+
+```
+[{"unMeta":{}},[{"t":"BulletList","c":[[{"t":"Plain","c":[{"t":"Str","c":"Element"},{"t":"Space","c":[]},{"t":"Str","c":"0"}]}],[{"t":"Plain","c":[{"t":"Str","c":"Element"},{"t":"Space","c":[]},{"t":"Str","c":"1"}]}],[{"t":"Plain","c":[{"t":"Str","c":"Element"},{"t":"Space","c":[]},{"t":"Str","c":"2"}]}],[{"t":"Plain","c":[{"t":"Str","c":"Element"},{"t":"Space","c":[]},{"t":"Str","c":"3"}]}],[{"t":"Plain","c":[{"t":"Str","c":"Element"},{"t":"Space","c":[]},{"t":"Str","c":"4"}]}]]}]]
+```
+
+Hence PanPipe will end up giving out a document equivalent to the following:
 
 ````
-```{.unwrap}
+``` {.unwrap}
+[{"unMeta":{}},[{"t":"BulletList","c":[[{"t":"Plain","c":[{"t":"Str","c":"Element"},{"t":"Space","c":[]},{"t":"Str","c":"0"}]}],[{"t":"Plain","c":[{"t":"Str","c":"Element"},{"t":"Space","c":[]},{"t":"Str","c":"1"}]}],[{"t":"Plain","c":[{"t":"Str","c":"Element"},{"t":"Space","c":[]},{"t":"Str","c":"2"}]}],[{"t":"Plain","c":[{"t":"Str","c":"Element"},{"t":"Space","c":[]},{"t":"Str","c":"3"}]}],[{"t":"Plain","c":[{"t":"Str","c":"Element"},{"t":"Space","c":[]},{"t":"Str","c":"4"}]}]]}]]
+```
+````
+
+Running *that* code through PanHandle will splice the contents into the document
+to give (a JSON equivalent of):
+
+```
  - Element 0
  - Element 1
  - Element 2
  - Element 3
 ```
-````
 
-Running *that* code through PanHandle will give:
+Note that this is no longer in a codeblock, so it will render like this:
 
  - Element 0
  - Element 1
  - Element 2
  - Element 3
 
-In a similar way, we can include other Markdown documents quite easily:
+Hence we can use PanPipe to obtain or generate data, and PanHandle to splice it
+into the document in a sensible way. For example, it's easy to include one
+Markdown document inside another:
 
 ````
 ```{.unwrap pipe="sh"}
-cat /some/file.md
+cat /some/file.md | pandoc -t json
+```
 
-wget -O md http://some.site/some/markdown
-cat md
+```{.unwrap pipe="sh"}
+wget -O- http://some.site/some/markdown | pandoc -t json
 ```
 ````
