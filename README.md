@@ -220,11 +220,11 @@ cat script2.py
 PanPipe also works on inline code snippets; for example, my root filesystem is
 currently at `` `df -h | grep "/$" | grep -o "[0-9]*%"`{pipe="sh"} `` capacity.
 
-### PanHandler ###
+### PanHandle ###
 
 PanPipe keeps the results of script execution inside code blocks/lines, where
 they can't interfere with the formatting. If you want to splice some of these
-results back into the document, you can use the PanHandler script which was
+results back into the document, you can use the PanHandle script which was
 written to complement PanPipe.
 
 For example, to generate a Markdown list and insert it into the document, we can
@@ -248,7 +248,7 @@ Running this code through PanPipe will give:
 ```
 ````
 
-Running *that* code through PanHandler will give:
+Running *that* code through PanHandle will give:
 
  - Element 0
  - Element 1
