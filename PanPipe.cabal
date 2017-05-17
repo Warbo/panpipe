@@ -1,4 +1,4 @@
-name:                PanPipe
+name:                panpipe
 version:             0.2.0.0
 synopsis:            Pandoc filter to execute code blocks
 description:         Executes pandoc code blocks annotated with 'pipe'
