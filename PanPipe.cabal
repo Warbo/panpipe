@@ -1,6 +1,7 @@
 name:                PanPipe
 version:             0.2.0.0
 synopsis:            Pandoc filter to execute code blocks
+description:         Executes pandoc code blocks annotated with 'pipe'
 homepage:            http://chriswarbo.net/essays/activecode
 license:             PublicDomain
 license-file:        LICENSE
@@ -11,6 +12,10 @@ build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
 
+source-repository head
+  type:     git
+  location: http://chriswarbo.net/git/panpipe.git
+                     
 library
   hs-source-dirs:      src
   default-language:    Haskell2010
