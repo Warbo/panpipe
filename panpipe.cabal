@@ -1,8 +1,8 @@
 name:                panpipe
-version:             0.2.0.0
+version:             0.3.0.0
 synopsis:            Pandoc filter to execute code blocks
 description:         Executes pandoc code blocks annotated with 'pipe'
-homepage:            http://chriswarbo.net/essays/activecode
+homepage:            http://chriswarbo.net/projects/activecode
 license:             PublicDomain
 license-file:        LICENSE
 author:              Chris Warburton
@@ -42,6 +42,6 @@ test-suite test
   build-depends:       base >=4.7 && <4.10
                      , panpipe
                      , QuickCheck
-                     , tasty >= 0.7
+                     , tasty >= 0.11.2.1
                      , tasty-quickcheck
                      , pandoc
