@@ -25,8 +25,8 @@ with rec {
 
   buildForHaskell = pkgs: hsPkgs: rec {
     # Uses Haskell package set provided by nixpkgs
-    nixpkgsExpr  = pkgs.runCabal2nix { url = ./.; };  # Useful GC root
-    nixpkgsDeps  = hsPkgs.callPackage nixExpr {};     # Actual Haskell build
+    nixpkgsExpr  = pkgs.runCabal2nix { url = ./.; };   # Useful GC root
+    nixpkgsDeps  = hsPkgs.callPackage nixpkgsExpr {};  # Actual Haskell build
 
     # Uses a Cabal sandbox to pick dependencies from (a snapshot of) Hackage
     hackageDeps = pkgs.haskellPkgWithDeps {
