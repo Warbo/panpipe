@@ -5,8 +5,8 @@ with builtins;
 with rec {
   pinnedConfig = (import <nixpkgs> { config = {}; }).fetchgit {
     url    = http://chriswarbo.net/git/nix-config.git;
-    rev    = "c0b9b01";
-    sha256 = "10yjhy8l6rnrqxzq4g17078k06bp6lkmbgk8x76ng54zs3mkj175";
+    rev    = "7b96c3a";
+    sha256 = "0sqhf599ll2qshbnmspni5r3h5mfwbbkyz5xhfb3jxhflba594zw";
   };
 
   pkgSets = { pinnedConfig = import pinnedConfig {}; } //
