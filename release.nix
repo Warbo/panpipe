@@ -4,7 +4,7 @@
 with builtins;
 with rec {
   pkgs    = import <nixpkgs> {};
-  helpers = pkgs.nix-helpers or (pkgs.fetchgit {
+  helpers = pkgs.nix-helpers or import (pkgs.fetchgit {
     url    = http://chriswarbo.net/git/nix-helpers.git;
     rev    = "6227a40";
     sha256 = "077kcal167ixwjj41sqrndd5pwvyavs20h826qx3ijl2i02wmwxs";
