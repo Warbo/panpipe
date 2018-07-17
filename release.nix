@@ -11,11 +11,11 @@ with rec {
   });
 };
 with pkgs // helpers // pkgs.lib;
-haskellRelease {
+collapseAttrs (haskellRelease {
   name        = "panpipe";
   dir         = ./.;
   hackageSets = {
     nixpkgs1709 = [ "ghc7103" ];
     nixpkgs1803 = [ "ghc7103" ];
   };
-}
+})
