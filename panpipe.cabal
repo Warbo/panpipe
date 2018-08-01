@@ -1,5 +1,5 @@
 name:                panpipe
-version:             0.3.0.0
+version:             0.3.1.0
 synopsis:            Pandoc filter to execute code blocks
 description:         Executes pandoc code blocks annotated with 'pipe'
 homepage:            http://chriswarbo.net/projects/activecode
@@ -20,7 +20,7 @@ library
   hs-source-dirs:      src
   default-language:    Haskell2010
   exposed-modules:     PanPipe
-  build-depends:       base         >=4.7  && <4.10
+  build-depends:       base         >=4.7  && <4.11
                      , unix         >=2.7  && <2.8
                      , process      >=1.2  && <1.7
                      , pandoc       >=1.17 && <1.18
@@ -31,7 +31,7 @@ executable panpipe
   hs-source-dirs:      panpipe
   main-is:             Main.hs
   default-language:    Haskell2010
-  build-depends:       base >=4.7 && < 4.10
+  build-depends:       base >=4.7 && < 4.11
                      , panpipe
 
 test-suite test
@@ -39,7 +39,7 @@ test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Main.hs
-  build-depends:       base >=4.7 && <4.10
+  build-depends:       base >=4.7 && <4.11
                      , panpipe
                      , QuickCheck
                      , tasty >= 0.11.2.1
