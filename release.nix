@@ -19,7 +19,7 @@ with {
       (old.overrides or (_: _: {}))
       (self: super: {
         # Force dependency version
-        attoparsec = self.callPackage
+        attoparsec = haskell.lib.dontCheck (self.callPackage
           ({ mkDerivation, array, base, bytestring, containers, deepseq
            , QuickCheck, quickcheck-unicode, scientific, stdenv, tasty
            , tasty-quickcheck, text, transformers, vector
@@ -40,7 +40,7 @@ with {
              description = "Fast combinator parsing for bytestrings and text";
              license = stdenv.lib.licenses.bsd3;
            })
-         {};
+         {});
 
         # We use Pandoc 0.17 since its JSON format changed in 1.18
         pandoc = self.callPackage
