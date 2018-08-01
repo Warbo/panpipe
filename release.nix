@@ -113,6 +113,9 @@ with {
         name = "panpipe";
         src  = ./.;
       }) {};
+
+      # Test suite requires directory >= 1.3, which requires GHC 8
+      zip-archive = haskell.lib.dontCheck super.zip-archive;
     });
   });
 };
