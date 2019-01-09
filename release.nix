@@ -1,15 +1,10 @@
 # Used for building and testing on build servers like Hydra
-
-# Fetch a pinned nixpkgs version
-with {
-  nixpkgs1803 = (import <nixpkgs> {}).fetchgit {
-    url    = https://github.com/NixOS/nixpkgs.git;
-    rev    = "94d80eb";
-    sha256 = "1l4hdxwcqv5izxcgv3v4njq99yai8v38wx7v02v5sd96g7jj2i8f";
-  };
-};
 with builtins;
-with import nixpkgs1803 {};
+with import (fetchTarball {
+  name   = "nixpkgs1709";
+  url    = https://github.com/NixOS/nixpkgs/archive/17.09.tar.gz;
+  sha256 = "0kpx4h9p1lhjbn1gsil111swa62hmjs9g93xmsavfiki910s73sh";
+}) {};
 with lib;
 
 # Override particular dependencies
