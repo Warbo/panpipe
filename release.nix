@@ -10,110 +10,32 @@ with lib;
 # Override particular dependencies
 with {
   hsPkgs = haskell.packages.ghc7103.override (old: {
-    overrides = composeExtensions
-      (old.overrides or (_: _: {}))
-      (self: super: {
-        # Force dependency version
-        attoparsec = haskell.lib.dontCheck (self.callPackage
-          ({ mkDerivation, array, base, bytestring, containers, deepseq
-           , QuickCheck, quickcheck-unicode, scientific, stdenv, tasty
-           , tasty-quickcheck, text, transformers, vector
-           }:
-           mkDerivation {
-             pname = "attoparsec";
-             version = "0.13.0.2";
-             sha256 = "0spcybahmqxnmngfa9cf5rh7n2r8njrgkgwb6iplmfj4ys0z7xv9";
-             libraryHaskellDepends = [
-               array base bytestring containers deepseq scientific text
-               transformers
-             ];
-             testHaskellDepends = [
-               array base bytestring deepseq QuickCheck quickcheck-unicode
-               scientific tasty tasty-quickcheck text transformers vector
-             ];
-             homepage = "https://github.com/bos/attoparsec";
-             description = "Fast combinator parsing for bytestrings and text";
-             license = stdenv.lib.licenses.bsd3;
-           })
-         {});
-
-        # We use Pandoc 0.17 since its JSON format changed in 1.18
-        pandoc = self.callPackage
-          ({ mkDerivation, aeson, ansi-terminal, array, base
-           , base64-bytestring, binary, blaze-html, blaze-markup, bytestring
-           , cmark, containers, data-default, deepseq, Diff, directory
-           , executable-path, extensible-exceptions, filemanip, filepath
-           , ghc-prim, haddock-library, highlighting-kate, hslua, HTTP
-           , http-client, http-client-tls, http-types, HUnit, JuicyPixels, mtl
-           , network, network-uri, old-time, pandoc-types, parsec, process
-           , QuickCheck, random, scientific, SHA, stdenv, syb, tagsoup
-           , temporary, test-framework, test-framework-hunit
-           , test-framework-quickcheck2, texmath, text, time
-           , unordered-containers, vector, xml, yaml, zip-archive, zlib
-           }:
-           mkDerivation {
-             pname = "pandoc";
-             version = "1.17.2";
-             sha256 = "1v78zq12p71gq0pc24h08inxcq5gxd0xb7m5ds0xw9pv9l2pswl1";
-             isLibrary = true;
-             isExecutable = true;
-             libraryHaskellDepends = [
-               aeson array base base64-bytestring binary blaze-html blaze-markup
-               bytestring cmark containers data-default deepseq directory
-               extensible-exceptions filemanip filepath ghc-prim haddock-library
-               highlighting-kate hslua HTTP http-client http-client-tls
-               http-types JuicyPixels mtl network network-uri old-time
-               pandoc-types parsec process random scientific SHA syb tagsoup
-               temporary texmath text time unordered-containers vector xml yaml
-               zip-archive zlib
-             ];
-             executableHaskellDepends = [
-               aeson base bytestring containers directory extensible-exceptions
-               filepath highlighting-kate HTTP network network-uri pandoc-types
-               text yaml
-             ];
-             testHaskellDepends = [
-               ansi-terminal base bytestring containers Diff directory
-               executable-path filepath highlighting-kate HUnit pandoc-types
-               process QuickCheck syb test-framework test-framework-hunit
-               test-framework-quickcheck2 text zip-archive
-             ];
-             homepage = "http://pandoc.org";
-             description = "Conversion between markup formats";
-             license = "GPL";
-             doCheck = false;
-             doHaddock = false;
-           }) {};
-
-        # pandoc-types 1.16 corresponds to the JSON format of pandoc 1.17
-        pandoc-types = self.callPackage
-          ({ mkDerivation, aeson, base, bytestring, containers, deepseq, ghc-prim
-           , stdenv, syb
-           }:
-           mkDerivation {
-             pname = "pandoc-types";
-             version = "1.16.1.1";
-             sha256 = "094mzgdxva84kcpjf9m8b5n3chm1wm44bzflh5x6xhddz6pb7zpq";
-             libraryHaskellDepends = [
-               aeson base bytestring containers deepseq ghc-prim syb
-             ];
-             homepage = "http://johnmacfarlane.net/pandoc";
-             description = "Types for representing a structured document";
-             license = stdenv.lib.licenses.bsd3;
-             doCheck = false;
-             doHaddock = false;
-           }) {};
-
-      panpipe = self.callPackage (self.haskellSrc2nix {
-        name = "panpipe";
-        src  = ./.;
-      }) {};
-
-      # Test suite requires directory >= 1.3, which requires GHC 8
-      zip-archive = haskell.lib.dontCheck super.zip-archive;
-    });
+    overrides = self: super:
+      {
+        # Runs cabal2nix and imports the result. Better than having default.nix
+        # files which get out of date.
+        panpipe = self.callPackage (self.haskellSrc2nix {
+          name = "panpipe";
+          src  = ./.;
+        }) {};
+      } // mapAttrs (name: version: haskell.lib.dontCheck
+                                      (self.callHackage name version {})) {
+        # These come from 'cabal new-freeze', which gives a full solution to the
+        # package constraints. This set started off empty, and each time the
+        # build failed due to missing dependencies I added just those
+        # dependencies to this set (taken from Cabal's freeze file).
+        "aeson"        = "0.11.3.0";
+        "blaze-html"   = "0.8.1.3";
+        "blaze-markup" = "0.7.1.1";
+        "pandoc"       = "1.17.2";
+        "pandoc-types" = "1.16.1.1";
+        "primitive"    = "0.6.1.0";
+        "syb"          = "0.6";
+        "texmath"      = "0.8.6.7";
+        "vector"       = "0.11.0.0";
+      };
   });
 };
 {
-  "nixpkgs1803-ghc7103-panpipe" = hsPkgs.panpipe;
+  "nixpkgs1709-ghc7103-panpipe" = hsPkgs.panpipe;
 }
