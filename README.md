@@ -230,8 +230,9 @@ currently at `` `df -h | grep "/$" | grep -o "[0-9]*%"`{pipe="sh"} `` capacity.
 
 PanPipe keeps the results of script execution inside code blocks/lines, where
 they can't interfere with the formatting. If you want to splice some of these
-results back into the document, you can use the PanHandle script which was
-written to complement PanPipe.
+results back into the document, you can use the
+[PanHandle](http://chriswarbo.net/git/panhandle/) script which was written to
+complement PanPipe.
 
 To prevent ambiguity, PanHandle requires data to be in PanDoc's JSON format. We
 can convert things to that format using the `-t json` option to the `pandoc`
