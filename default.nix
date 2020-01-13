@@ -9,7 +9,7 @@ with rec {
   # TODO: Point this at IOHK's repo once i686 support is included
   # See https://github.com/angerman/old-ghc-nix/pull/4
   haskellNixSrc = fetchTarball {
-    name   = "nixpkgs1909";
+    name   = "haskell-nix";
     url    = https://github.com/Warbo/haskell.nix/archive/499a761.tar.gz;
     sha256 = "1pnkywswfa71hgc2c3g2cijfk9nysbpyh6jjh455h810n4yhs522";
   };
