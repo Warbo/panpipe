@@ -4,14 +4,14 @@ module PanPipe where
 import Control.Applicative
 import Data.List
 import Data.Text (pack, Text, unpack)
+import System.Directory
 import System.Exit
 import System.IO
 import System.IO.Temp (withSystemTempDirectory)
 import System.Posix
 import System.Process
-import Text.Pandoc
+import Text.Pandoc.Definition
 import Text.Pandoc.JSON   (toJSONFilter)
-import Text.Pandoc.Shared (inDirectory)
 import Text.Pandoc.Walk   (walkM)
 
 pipeBWith :: (Functor m, Monad m) => (FilePath -> Text -> m Text)
@@ -49,5 +49,13 @@ transform doc = do cwd <-getWorkingDirectory
 
 transformDoc :: Pandoc -> IO Pandoc
 transformDoc = walkM pipeB
+
+inDirectory :: FilePath -> IO a -> IO a
+inDirectory path action = do
+  oldDir <- getCurrentDirectory
+  setCurrentDirectory path
+  result <- action
+  setCurrentDirectory oldDir
+  return result
 
 panpipeMain = toJSONFilter transform
