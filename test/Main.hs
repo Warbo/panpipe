@@ -3,7 +3,7 @@ import           Control.Applicative
 import           Data.Maybe
 import qualified Data.Text as T
 import           PanPipe
-import           Text.Pandoc
+import           Text.Pandoc.Definition
 import           Test.QuickCheck (Arbitrary, arbitrary, shrink)
 import           Test.Tasty (defaultMain, testGroup)
 import           Test.Tasty.QuickCheck (testProperty)
@@ -18,22 +18,24 @@ pipeBPass p s a1 a2 = let at x  = (u, u, a1 ++ x ++ a2)
                                                 (CodeBlock (at [("pipe", p)]) s)
                       in  lhs == p +++ s
 
-pipeBAttr i c a1 a2 = let at x = (i, c, a1 ++ x ++ a2)
-                          [CodeBlock as _] = pipeBWith (\_ _ -> [u])
-                                               (CodeBlock (at [("pipe", u)])
-                                                                  u)
-                      in  at [] == as
+pipeBAttr i c a1 a2 doc =
+  let at x = (i, c, a1 ++ x ++ a2)
+      [CodeBlock as _] = pipeBWith (\_ txt -> [txt])
+                                   (CodeBlock (at [("pipe", u)])
+                                              doc)
+  in  at [] == as
 
 pipeIPass p s a1 a2 = let at x  = (u, u, a1 ++ x ++ a2)
                           f a b = [T.pack a +++ b]
                           [Code _ lhs] = pipeIWith f (Code (at [("pipe", p)]) s)
                       in  lhs == p +++ s
 
-pipeIAttr i c a1 a2 = let at x = (i, c, a1 ++ x ++ a2)
-                          [Code as _] = pipeIWith (\_ _ -> [u])
-                                                  (Code (at [("pipe", u)])
-                                                        u)
-                      in at [] == as
+pipeIAttr i c a1 a2 doc =
+  let at x = (i, c, a1 ++ x ++ a2)
+      [Code as _] = pipeIWith (\_ txt -> [txt])
+                              (Code (at [("pipe", error "2")])
+                                    doc)
+  in at [] == as
 
 nonPipe as = isNothing $ partPipes (u, u, filter ((/= "pipe") . fst) as)
 
