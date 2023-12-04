@@ -1,5 +1,5 @@
 name:                panpipe
-version:             0.4.0.0
+version:             0.4.1.0
 synopsis:            Pandoc filter to execute code blocks
 description:         Executes pandoc code blocks annotated with 'pipe'
 homepage:            http://chriswarbo.net/projects/activecode
