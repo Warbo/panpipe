@@ -58,4 +58,5 @@ inDirectory path action = do
   setCurrentDirectory oldDir
   return result
 
+panpipeMain :: IO ()
 panpipeMain = toJSONFilter transform
